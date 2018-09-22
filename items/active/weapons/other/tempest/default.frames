@@ -9,5 +9,7 @@
     ]
   },
 
-  "aliases" : {}
+  "aliases" : {
+    "fullcharge.7" : "charge.5"
+  }
 }
