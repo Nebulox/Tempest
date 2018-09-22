@@ -21,8 +21,6 @@
   },
   "animationCustom" : {},
   
-  "animationScripts" : ["/items/active/effects/lightning.lua"],
-  
   "muzzleOffset" : [2.2, -0.6],
   "baseOffset" : [-0.1, -0.5],
 

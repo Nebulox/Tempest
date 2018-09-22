@@ -126,8 +126,23 @@
 	  "active" : false,
 	  "emissionRate" : 10.0,
 	  "transformationGroups" : ["muzzle"],
-	  "offsetRegion" : [0.1, -0.1, 0.1, -0.1],
-	  "particles" : []
+	  "offsetRegion" : [0.2, 0.3, -0.8, 0.7],
+	  "particles" : [
+        //{ "particle" : "tempestcharge"},
+		//{ "particle" : "tempestcharge"},
+		//{ "particle" : "tempestchargedspark"}
+	  ]
+	},
+	"chargedparticles" : {
+	  "active" : false,
+	  "emissionRate" : 10.0,
+	  "transformationGroups" : ["muzzle"],
+	  "offsetRegion" : [0, 0, -0, -0],
+	  "particles" : [
+        //{ "particle" : "tempestchargedspark"},
+		//{ "particle" : "tempestchargedspark2"},
+		//{ "particle" : "tempestchargedspark3"}
+	  ]
 	}
   },
 

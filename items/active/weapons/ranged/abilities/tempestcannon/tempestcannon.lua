@@ -12,7 +12,7 @@ function TempestShot:init()
   
   self.chargeHasStarted = false
   self.shouldDischarge = false
-
+  
   activeItem.setScriptedAnimationParameter("markerImage", "/items/active/weapons/ranged/abilities/tempestcannon/targetoverlay.png")
 
   self:reset()
@@ -49,27 +49,28 @@ function TempestShot:update(dt, fireMode, shiftHeld)
 end
 
 function TempestShot:charge()
-  
+
   self.weapon:setStance(self.stances.charge)
-  
+
   self.chargeHasStarted = true
-	
+
   animator.playSound("chargeLoop", -1)
   animator.setAnimationState("charging", "charge")
   animator.setParticleEmitterActive("chargeparticles", true)
-  
+
     --While charging, but not yet ready, count down the charge timer
   while self.chargeTimer > 0 and self.fireMode == (self.activatingFireMode or self.abilitySlot) and not world.lineTileCollision(mcontroller.position(), self:firePosition()) do
     self.chargeTimer = math.max(0, self.chargeTimer - self.dt)
 
 	--Prevent energy regen while charging
 	status.setResourcePercentage("energyRegenBlock", 0.6)
-	
+
 	--Enable walk while firing
 	if self.walkWhileFiring == true then
       mcontroller.controlModifiers({runningSuppressed=true})
 	end
-	
+
+	self.targets = util.filter(self.targets, world.entityExists)
 	if #self.targets < self.maxTargets then
       local newTarget = self:findTarget()
       if newTarget and status.overConsumeResource("energy", self.energyUsage) then
@@ -82,7 +83,7 @@ function TempestShot:charge()
 
     coroutine.yield()
   end  
-  
+
   --If the charge is ready, we have line of sight and plenty of energy, go to firing state
   if self.chargeTimer == 0 and status.overConsumeResource("energy", self:energyPerShot()) and not world.lineTileCollision(mcontroller.position(), self:firePosition()) then
     self:setState(self.fire)
@@ -92,7 +93,7 @@ function TempestShot:charge()
 	animator.playSound("discharge")
     self:setState(self.cooldown)
   end
-  
+
   if #self.targets > 0 and not world.lineTileCollision(mcontroller.position(), self:firePosition()) then
     self:setState(self.fire)
   else
@@ -101,15 +102,14 @@ function TempestShot:charge()
   end
 end
 
-
-function TempestShot:castBoltMultiple(targets)
+function TempestShot:castBoltMultiple(targets, lightning)
   self.boltSegments = {}
 
   local MuzzlePos = self:firePosition()
   self.lightning = {}
 
   for i,v in ipairs(targets) do
-    local bolt = copy(self.lightningConfig) or {
+    local bolt = copy(lightning) or {
       displacement = 1.5,
       minDisplacement = 0.5,
       forks = 0.5,
@@ -147,18 +147,27 @@ function TempestShot:fire()
 	  local damageLine = {}
 	  damageLine[1] = self.weapon.muzzleOffset
 	  --damageLine[2] = world.distance(self.weapon.muzzleOffset, world.entityPosition(target))
-	  damageLine[2] = vec2.add(self.weapon.muzzleOffset, {5, test})
+	  --damageLine[2] = vec2.add(self.weapon.muzzleOffset, {5, test})
+	  damageLine[2] = self:unfuckPos(world.entityPosition(target))
 	  test = test + 1
 	  table.insert(damageLines, damageLine)
 	end
 	
   if self.stances.fire.duration then
     util.wait(self.stances.fire.duration, function()
-	  self:castBoltMultiple(self.targets)
-	  self.weapon:setDamageAreas(self.damageConfig, damageLines, self.stances.fire.duration)
-	end)
+      self:castBoltMultiple(self.targets, self.lightningBase)
+      self.weapon:setDamageAreas(self.damageConfig, damageLines, self.stances.fire.duration)
+    end)
   end
-	activeItem.setScriptedAnimationParameter("entities", {})
+    activeItem.setScriptedAnimationParameter("entities", {})
+    activeItem.setScriptedAnimationParameter("lightning", {})
+    util.wait(self.stances.fire.durationStrong, function()
+      self:castBoltMultiple(self.targets, self.lightningStrong)
+    end)
+    activeItem.setScriptedAnimationParameter("lightning", {})
+    util.wait(self.stances.fire.durationWeak, function()
+      self:castBoltMultiple(self.targets, self.lightningWeak)
+    end)
     activeItem.setScriptedAnimationParameter("lightning", {})
     self.targets = {}
 	
@@ -287,6 +296,17 @@ function TempestShot:reset()
   activeItem.setScriptedAnimationParameter("entities", {})
   activeItem.setScriptedAnimationParameter("lightning", {})
   self.targets = {}
+end
+
+--princess's code
+function TempestShot:unfuckPos(vector)
+  local aimAngle, aimDirection = activeItem.aimAngleAndDirection(self.weapon.aimOffset, activeItem.ownerAimPosition())
+--local endPoint = world.distance(vector, mcontroller.position())
+--endPoint = vec2.sub(endPoint, activeItem.handPosition())
+--endPoint = vec2.rotate(endPoint, -aimAngle*aimDirection)
+  local endPoint = vec2.rotate(vec2.sub(world.distance(vector, mcontroller.position()), activeItem.handPosition()), -aimAngle*aimDirection)
+  endPoint[1] = endPoint[1]*aimDirection
+  return endPoint
 end
 
 function TempestShot:findTarget()

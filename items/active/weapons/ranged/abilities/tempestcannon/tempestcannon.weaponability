@@ -49,6 +49,33 @@
       "knockback" : 1,
 	  "baseDamage" : 10
     },
+	//The 1st bolt or the damaging one
+	"lightningBase" : {
+	  "displacement" : 1.5,
+      "minDisplacement" : 0.5,
+      "forks" : 0.5,
+      "forkAngleRange" : 0.1,
+      "width" : 1,
+      "color" : [96,184,234,200]
+	},
+	//The 2nd bolt the fading one, doesnt deal damage
+	"lightningStrong" : {
+	  "displacement" : 1.5,
+      "minDisplacement" : 0.5,
+      "forks" : 0.5,
+      "forkAngleRange" : 0.1,
+      "width" : 1,
+      "color" : [96,184,234,135]
+	},
+	//The 3rd bolt the second fading one, also lacks damage
+	"lightningWeak" : {	  
+	  "displacement" : 1.5,
+      "minDisplacement" : 0.5,
+      "forks" : 0.5,
+      "forkAngleRange" : 0.1,
+      "width" : 1,
+      "color" : [96,184,234,55]
+	},
 
     "projectileType" : "chainbullet",
 	"projectileCount" : 1,
@@ -95,11 +122,13 @@
       "fire" : {
 		"frontArmFrame": "idle.3",
 		"backArmFrame": "rotation",
-        "armRotation" : 6,
-        "weaponRotation" : 6,
-	    "weaponOffset" : [-0.2, -0.65],
+        "armRotation" : 0,
+        "weaponRotation" : 0,
+	    "weaponOffset" : [0, -0.65],
         "twoHanded" : true,
         "duration" : 0.25,
+        "durationWeak" : 0.1,
+        "durationStrong" : 0.1,
 
         "allowRotate" : false,
         "allowFlip" : false
@@ -110,7 +139,7 @@
         "duration" : 0.05,
         "armRotation" : 6,
         "weaponRotation" : 6,
-	    "weaponOffset" : [-0.2, -0.65],
+	    "weaponOffset" : [0, -0.65],
         "twoHanded" : true,
 
         "allowRotate" : false,
