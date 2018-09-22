@@ -1,0 +1,39 @@
+{
+  "itemName" : "tempestcannon",
+  "price" : 1500,
+  "maxStack" : 1,
+  "rarity" : "Legendary",
+  "description" : "An unusual weapon that charges and releases bolts of lethal lightning.",
+  "shortdescription" : "The Tempest",
+  "tooltipKind" : "gun",
+  "category" : "uniqueWeapon",
+  "twoHanded" : true,
+  "itemTags" : ["weapon","ranged"],
+  "level" : 1,
+
+  "inventoryIcon" : "tempesticon.png",
+
+  "animation" : "tempest.animation",
+  "animationParts" : {
+    "gun" : "tempest.png",
+    "gunfullbright" : "tempestfullbright.png",
+    "muzzleFlash" : "/items/active/weapons/ranged/muzzleflash/tempestmuzzle.png"
+  },
+  "animationCustom" : {},
+  
+  "animationScripts" : ["/items/active/effects/lightning.lua"],
+  
+  "muzzleOffset" : [2.2, -0.6],
+  "baseOffset" : [-0.1, -0.5],
+
+  "aimOffset" : -1,
+  
+  "scripts" : ["/items/active/weapons/ranged/thea-gun.lua"],
+
+  "elementalType" : "physical",
+
+  "primaryAbilityType" : "tempestcannon",
+  "primaryAbility" : {},
+
+  "builder" : "/items/buildscripts/buildunrandweapon.lua"
+}

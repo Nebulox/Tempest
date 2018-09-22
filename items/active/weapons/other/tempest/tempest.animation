@@ -1,0 +1,145 @@
+{
+  "animatedParts" : {
+    "stateTypes" : {
+      "firing" : {
+        "default" : "off",
+        "states" : {
+          "off" : {},
+          "fire" : {
+            "frames" : 3,
+            "cycle" : 0.25,
+            "mode" : "transition",
+            "transition" : "off"
+          }
+        }
+      },
+      "charging" : {
+        "default" : "off",
+        "states" : {
+          "off" : {},
+          "charge" : {
+            "frames" : 5,
+            "cycle" : 1.0,
+            "mode" : "transition",
+            "transition" : "fullcharge"
+          },
+          "fullcharge" : {
+            "frames" : 7,
+            "cycle" : 1.0,
+            "mode" : "loop"
+          }
+        }
+      }
+    },
+
+    "parts" : {
+      "gun" : {
+        "properties" : {
+          "centered" : true,
+          "offset": [-0.1, -0.5],
+          "transformationGroups" : ["weapon"]
+        },
+
+        "partStates" : {
+          "charging" : {
+            "off" : {
+              "properties" : {
+                "image" : "<partImage>:empty"
+              }
+            },
+            "charge" : {
+              "properties" : {
+                "image" : "<partImage>:charge.<frame>"
+              }
+            },
+            "fullcharge" : {
+              "properties" : {
+                "image" : "<partImage>:fullcharge.<frame>"
+              }
+            }
+          }
+        }
+      },
+      "gunfullbright" : {
+        "properties" : {
+          "centered" : true,
+          "offset" : [-0.1, -0.5],
+          "transformationGroups" : ["weapon"],
+          "zLevel" : 1,
+          "fullbright" : true
+        },
+
+        "partStates" : {
+          "charging" : {
+            "off" : {
+              "properties" : {
+                "image" : "<partImage>:empty"
+              }
+            },
+            "charge" : {
+              "properties" : {
+                "image" : "<partImage>:charge.<frame>"
+              }
+            },
+            "fullcharge" : {
+              "properties" : {
+                "image" : "<partImage>:fullcharge.<frame>"
+              }
+            }
+          }
+        }
+      },
+      "muzzleFlash" : {
+        "properties" : {
+          "zLevel" : 2,
+          "centered" : true,
+          "offset" : [0.3, -0.5],
+          "fullbright" : true,
+          "transformationGroups" : ["weapon"]
+        },
+
+        "partStates" : {
+          "firing" : {
+            "fire" : {
+              "properties" : {
+                "image" : "<partImage>:<variant>.<frame>"
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+
+  "transformationGroups" : {
+    "weapon" : {},
+    "muzzle" : {}
+  },
+
+  "particleEmitters" : {
+    "muzzleFlash" : {
+      "transformationGroups" : ["muzzle"],
+      "offsetRegion" : [0, 0, 0, 0],
+      "particles" : [ ]
+    },
+	"chargeparticles" : {
+	  "active" : false,
+	  "emissionRate" : 10.0,
+	  "transformationGroups" : ["muzzle"],
+	  "offsetRegion" : [0.1, -0.1, 0.1, -0.1],
+	  "particles" : []
+	}
+  },
+
+  "lights" : {
+    "muzzleFlash" : {
+      "active" : false,
+      "position" : [0, 0],
+      "color" : [60, 80, 90]
+    }
+  },
+
+  "sounds" : {
+    "fire" : ["/sfx/gun/mech_teslastream_fire1.ogg", "/sfx/gun/mech_teslastream_fire2.ogg", "/sfx/gun/mech_teslastream_fire3.ogg", "/sfx/gun/mech_teslastream_fire4.ogg", "/sfx/gun/mech_teslastream_fire5.ogg", "/sfx/gun/mech_teslastream_fire6.ogg"]
+  }
+}
