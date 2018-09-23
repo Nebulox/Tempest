@@ -49,7 +49,6 @@ function TempestShot:update(dt, fireMode, shiftHeld)
 end
 
 function TempestShot:charge()
-
   self.weapon:setStance(self.stances.charge)
 
   self.chargeHasStarted = true
@@ -70,6 +69,11 @@ function TempestShot:charge()
       mcontroller.controlModifiers({runningSuppressed=true})
 	end
 
+	--Calculate how far into the charge we are. Do 1 - X because we count from 1 to 0, not 0 to 1
+	local chargePercentage = 1 - (self.chargeTimer / self.chargeTime)
+	--Update the lightning charge level. This function also call the draw lightning code
+	self.chargeLevel = self:setChargeLevel(chargePercentage, self.chargeLevel)
+
 	self.targets = util.filter(self.targets, world.entityExists)
 	if #self.targets < self.maxTargets then
       local newTarget = self:findTarget()
@@ -80,24 +84,17 @@ function TempestShot:charge()
         activeItem.setScriptedAnimationParameter("entities", self.targets)
       end
     end
-
+	
     coroutine.yield()
-  end  
+  end
 
   --If the charge is ready, we have line of sight and plenty of energy, go to firing state
-  if self.chargeTimer == 0 and status.overConsumeResource("energy", self:energyPerShot()) and not world.lineTileCollision(mcontroller.position(), self:firePosition()) then
+  if self.chargeTimer == 0 and status.overConsumeResource("energy", self:energyPerShot()) and #self.targets > 0 and not world.lineTileCollision(mcontroller.position(), self:firePosition()) then
     self:setState(self.fire)
   --If not charging and charge isn't ready, go to cooldown
   else
     self.shouldDischarge = true
 	animator.playSound("discharge")
-    self:setState(self.cooldown)
-  end
-
-  if #self.targets > 0 and not world.lineTileCollision(mcontroller.position(), self:firePosition()) then
-    self:setState(self.fire)
-  else
-    animator.playSound("disengage")
     self:setState(self.cooldown)
   end
 end
@@ -136,6 +133,9 @@ function TempestShot:fire()
   animator.setParticleEmitterActive("chargeparticles", false)
   
   self.chargeHasStarted = false
+  
+  --Disable the lightning animation
+  activeItem.setScriptedAnimationParameter("lightning", {})
   
   --Fire a projectile and show a muzzleflash, then continue on with this state
   --self:fireProjectile()
@@ -229,6 +229,34 @@ function TempestShot:muzzleFlash()
   animator.setLightActive("muzzleFlash", true)
 end
 
+function TempestShot:setChargeLevel(chargePercentage, currentLevel)
+  local level = math.ceil(chargePercentage * self.chargeLevels)
+  if currentLevel < level then
+    local lightningCharge = self.lightningChargeLevels[level]
+    self:setLightning(lightningCharge[1], lightningCharge[2], lightningCharge[3], lightningCharge[4], lightningCharge[5], lightningCharge[6], lightningCharge[7])
+  end
+  return level
+end
+
+function TempestShot:setLightning(amount, width, forks, displacement, color, startOffset, endOffset)
+  local lightning = {}
+  for i = 1, amount do
+    local bolt = {
+      minDisplacement = 0.125,
+      forks = forks,
+      forkAngleRange = 0.75,
+      width = width,
+	  displacement = displacement,
+      color = color
+    }	
+	bolt.itemStartPosition = vec2.add(self.weapon.muzzleOffset, startOffset)
+	bolt.itemEndPosition = vec2.add(self.weapon.muzzleOffset, endOffset)
+    table.insert(lightning, bolt)
+  end
+  activeItem.setScriptedAnimationParameter("lightning", lightning)
+end
+
+
 function TempestShot:cooldown()
   if self.shouldDischarge == true then
     self.weapon:updateAim()
@@ -292,6 +320,9 @@ function TempestShot:reset()
   animator.setParticleEmitterActive("chargeparticles", false)
   self.chargeHasStarted = false
   self.weapon:setStance(self.stances.idle)
+  
+  --Reset the lightning charge level
+  self.chargeLevel = 0
 
   activeItem.setScriptedAnimationParameter("entities", {})
   activeItem.setScriptedAnimationParameter("lightning", {})
